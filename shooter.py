@@ -2,6 +2,7 @@ import pygame
 import os
 import time
 import random
+import math
 
 # TODO turn ships into dragons
 # initialize pygame font module
@@ -88,8 +89,6 @@ class Ship:
             self.cool_down_counter = 1
 
 
-
-
 class Player(Ship):
     def __init__(self, x, y, health=100):
         super().__init__(x, y, health)
@@ -113,12 +112,15 @@ class Player(Ship):
                             self.projectiles.remove(projectile)
 
     def healthbar(self, window):
-        pygame.draw.rect(window, (255,0,0), (self.x, self.y + self.dragon_img.get_height() + 10, self.dragon_img.get_width(), 10))
-        pygame.draw.rect(window, (0,255,0), (self.x, self.y + self.dragon_img.get_height() + 10, self.dragon_img.get_width() * (self.health/self.max_health), 10))
+        pygame.draw.rect(window, (255, 0, 0),
+                         (self.x, self.y + self.dragon_img.get_height() + 10, self.dragon_img.get_width(), 10))
+        pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.dragon_img.get_height() + 10,
+                                               self.dragon_img.get_width() * int(self.health / self.max_health), 10))
 
     def draw(self, window):
         super().draw(window)
         self.healthbar(window)
+
 
 # TODO give enemies unique projectiles
 
@@ -140,7 +142,7 @@ class Enemy(Ship):
 
     def shoot(self):
         if self.cool_down_counter == 0:
-            projectile = Projectile(self.x-20, self.y, self.projectile_img)
+            projectile = Projectile(self.x - 20, self.y, self.projectile_img)
             self.projectiles.append(projectile)
             self.cool_down_counter = 1
 
@@ -149,8 +151,6 @@ def collide(obj1, obj2):
     offset_x = obj2.x - obj1.x
     offset_y = obj2.y - obj1.y
     return obj1.mask.overlap(obj2.mask, (offset_x, offset_y)) is not None
-
-
 
 
 # the main game loop
@@ -193,7 +193,7 @@ def main():
 
         if lost:
             lost_label = lost_font.render("You Lost!", 1, (255, 0, 0))
-            WINDOW.blit(lost_label, (WIDTH/2 - lost_label.get_width()/2, 350))
+            WINDOW.blit(lost_label, ((WIDTH / 2 - lost_label.get_width() / 2), 350))
 
         pygame.display.update()
 
@@ -215,7 +215,8 @@ def main():
             wave_length += 5
             # spawn enemies at different heights above the screen and allow them to descend at same velocity
             for i in range(wave_length):
-                enemy = Enemy(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100), random.choice(["red", "yellow", "purple"]))
+                enemy = Enemy(random.randrange(50, WIDTH - 100), random.randrange(-1500, -100),
+                              random.choice(["red", "yellow", "purple"]))
                 enemies.append(enemy)
 
         # ends the main game loop when the window is closed
@@ -240,7 +241,7 @@ def main():
             enemy.move(enemy_vel)
             enemy.move_projectiles(projectile_vel, player)
 
-            if random.randrange(0, 2*60) == 1:
+            if random.randrange(0, 2 * 60) == 1:
                 enemy.shoot()
 
             if collide(enemy, player):
