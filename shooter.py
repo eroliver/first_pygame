@@ -13,15 +13,15 @@ WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dragon_Shooter_Game")
 
 # load images into the game
-PLAYER_DRAGON = pygame.image.load(os.path.join("assets", "player00.png"))
-RED_ENEMY = pygame.image.load(os.path.join("assets", "red_black_enemy.png"))
-YELLOW_ENEMY = pygame.image.load(os.path.join("assets", "yellow_black_enemy.png"))
-PURPLE_ENEMY = pygame.image.load(os.path.join("assets", "purple_enemy.png"))
-PLAYER_PROJECTILE = pygame.image.load(os.path.join("assets", "player_bullet.png"))
-ENEMY_PROJECTILE = pygame.image.load(os.path.join("assets", "enemy_bullet.png"))
+PLAYER_DRAGON = pygame.image.load(os.path.join("assets", "player_dragon_blue.png"))
+RED_ENEMY = pygame.image.load(os.path.join("assets", "red_dragon.png"))
+YELLOW_ENEMY = pygame.image.load(os.path.join("assets", "yellow_dragon.png"))
+PURPLE_ENEMY = pygame.image.load(os.path.join("assets", "purple_dragon.png"))
+PLAYER_PROJECTILE = pygame.image.load(os.path.join("assets", "player_projectile.png"))
+ENEMY_PROJECTILE = pygame.image.load(os.path.join("assets", "enemy_projectile.png"))
 BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "star_background.png")), (WIDTH, HEIGHT))
 
-
+# TODO center projectiles with source object
 class Projectile:
     def __init__(self, x, y, img):
         self.x = x
@@ -115,7 +115,7 @@ class Player(Ship):
         pygame.draw.rect(window, (255, 0, 0),
                          (self.x, self.y + self.dragon_img.get_height() + 10, self.dragon_img.get_width(), 10))
         pygame.draw.rect(window, (0, 255, 0), (self.x, self.y + self.dragon_img.get_height() + 10,
-                                               self.dragon_img.get_width() * int(self.health / self.max_health), 10))
+                                               self.dragon_img.get_width() * (self.health / self.max_health), 10))
 
     def draw(self, window):
         super().draw(window)
@@ -142,7 +142,7 @@ class Enemy(Ship):
 
     def shoot(self):
         if self.cool_down_counter == 0:
-            projectile = Projectile(self.x - 20, self.y, self.projectile_img)
+            projectile = Projectile(self.x + 20, self.y, self.projectile_img)
             self.projectiles.append(projectile)
             self.cool_down_counter = 1
 
@@ -250,6 +250,24 @@ def main():
             elif enemy.y + enemy.get_height() > HEIGHT:
                 lives -= 1
                 enemies.remove(enemy)
+
+        player.move_projectiles(-projectile_vel, enemies)
+
+
+def main_menu():
+    title_font = pygame.font.SysFont("Helvetica", 70)
+    run = True
+    while run:
+        WINDOW.blit(BG, (0,0))
+        title_label = title_font.render("Press the mouse to begin...", 1, (255,255,255))
+        WINDOW.blit(title_label, (WIDTH/2 - title_label.get_width()/2, 350))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                main()
+    pygame.quit()
 
 
 main()
